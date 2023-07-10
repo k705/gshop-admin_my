@@ -11,10 +11,25 @@ export interface ResTrademark{
 export type ResTrademarkByPage = ResPage<ResTrademark[]>;
 
 enum URLS{
-    LIST = "/product/baseTrademark"
+    LIST = "/product/baseTrademark",
+    ADD="/product/baseTrademark/save",
+
 }
 
 // 请求品牌列表数据
 export function requestTrademarkListByPage(page =1,limit=5) {
         return request.get<any,ResTrademarkByPage>(`${URLS.LIST}/${page}/${limit}`)
     }
+
+
+/* -----------弹出添加品牌框--------- */
+    // 定义数据类型
+export interface ReqSaveTrademark {
+    tmName: string,
+    logoUrl:string
+}
+
+// 请求数据
+export function requestSaveTrademark(data: ReqSaveTrademark) {
+    return  request.post<any,null>(URLS.ADD,data)
+}
