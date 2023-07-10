@@ -55,10 +55,11 @@ const page = ref(1);
 const pageSize = ref(5);
 
 // 声明方法
+
 // 请求trademark
 async function getTrademarkListByPage() {
   try {
-    const res = await requestTrademarkListByPage();
+    const res = await requestTrademarkListByPage(page.value,pageSize.value);
     // console.log(res);
     /* ref数据不写value两种情况：1.模板中  2.reactive中的数据为ref数据（但如果是ref数组则不行，reactive不能劫持数据方法） */
     trademarks.value = res.records;
