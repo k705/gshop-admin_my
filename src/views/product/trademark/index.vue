@@ -28,6 +28,24 @@
     >
     </el-pagination>
   </el-card>
+
+ <!--  <el-dialog title="添加品牌" v-model="isShowAddTrademarkDialog" >
+  <el-form :model="form">
+    <el-form-item label="品牌名称" :label-width="formLabelWidth">
+      <el-input v-model="form.name" autocomplete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="品牌Logo" :label-width="formLabelWidth">
+      <el-select v-model="form.region" placeholder="请选择活动区域">
+        <el-option label="区域一" value="shanghai"></el-option>
+        <el-option label="区域二" value="beijing"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+  </div>
+</el-dialog> -->
 </template>
 
 <script lang="ts">
@@ -58,8 +76,8 @@ const pageSize = ref(5);
 // 请求trademark
 async function getTrademarkListByPage() {
   try {
-    const res = await requestTrademarkListByPage();
-    // console.log(res);
+    const res = await requestTrademarkListByPage(page.value, pageSize.value);
+    console.log(res);
     /* ref数据不写value两种情况：1.模板中  2.reactive中的数据为ref数据（但如果是ref数组则不行，reactive不能劫持数据方法） */
     trademarks.value = res.records;
     total.value = res.total;
