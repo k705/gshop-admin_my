@@ -6,7 +6,7 @@
         <el-button
           type="primary"
           icon="ele-Plus"
-          @click="showAddTrademarkDialog"
+          @click="showAddOrEditTrademarkDialog()"
         >
           添加
         </el-button>
@@ -15,13 +15,25 @@
       <!-- footer-table组件 -->
       <el-table :data="trademarks">
         <el-table-column label="序号" type="index"></el-table-column>
-        <el-table-column label="品牌名称" ></el-table-column>
-        <el-table-column label="品牌LOGO" >
+        <el-table-column label="品牌名称" prop="tmName"></el-table-column>
+        <el-table-column label="品牌LOGO">
           <template #="{ row }">
             <img :src="row.logoUrl" width="100" />
           </template>
         </el-table-column>
-        <el-table-column label="操作"></el-table-column>
+        <el-table-column label="操作">
+          <template #="{ row }">
+            <el-button
+              type="warning"
+              icon="ele-Edit"
+              @click="showAddOrEditTrademarkDialog(row)"
+              >编辑</el-button
+            >
+            <el-button type="danger" icon="ele-Delete" @click=""
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
       <!-- footer-pagination组件 -->
       <el-pagination
@@ -65,8 +77,10 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="notShowAddTrademarkDialog">取 消</el-button>
-        <el-button type="primary" @click="addTrademarkHandler">确 定</el-button>
+        <el-button @click="isShowAddTrademarkDialog = false">取 消</el-button>
+        <el-button type="primary" @click="addOrUpdateTrademarkHandler"
+          >确 定</el-button
+        >
       </template>
     </el-dialog>
   </div>
@@ -82,16 +96,21 @@ export default defineComponent({
 
 <script lang="ts" setup>
 // 导入vue内置模块
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 
 // 导入请求
 import {
   requestTrademarkListByPage,
   requestSaveBaseTrademark,
+  requestEditBaseTrademark,
 } from "@/api/trademark";
 
 // 导入类型
-import type { ResTrademark, ReqSaveBaseTrademark } from "@/api/trademark";
+import type {
+  ResTrademark,
+  ReqSaveBaseTrademark,
+  ReqEditBaseTrademark,
+} from "@/api/trademark";
 import type { FormRules } from "element-plus";
 import { ElMessage } from "element-plus";
 
@@ -109,6 +128,7 @@ const rules: FormRules = {
       min: 1,
       max: 20,
       message: "品牌名称必须是1-20个字符之间",
+      trigger: "blur",
     },
   ],
   logoUrl: [
@@ -126,6 +146,7 @@ const rules: FormRules = {
           }
         }
       },
+      trigger: "blur",
     },
   ],
 };
@@ -135,7 +156,7 @@ const formData = ref<ReqSaveBaseTrademark>({
   tmName: "",
   logoUrl: "",
 });
-
+const messageType = ref("");
 // 声明方法
 // 请求trademark
 async function getTrademarkListByPage() {
@@ -162,33 +183,48 @@ function handleSizeChange(v: number) {
 
 /* ---------------------添加------------------------------ */
 // 点击添加显示添加框
-function showAddTrademarkDialog() {
+function showAddOrEditTrademarkDialog(data?: ReqEditBaseTrademark) {
   isShowAddTrademarkDialog.value = true;
-}
-function notShowAddTrademarkDialog() {
-  isShowAddTrademarkDialog.value = false;
+  if (data) {
+    messageType.value = "修改";
+    formData.value = { ...data };
+  } else {
+    messageType.value = "添加";
+
+    formData.value = {
+      tmName: "",
+      logoUrl: "",
+    };
+  }
+  nextTick(() => {
+    formRef.value?.clearValidate();
+  });
 }
 
 // 点击添加框的确定按钮发送请求
-async function addTrademarkHandler() {
+async function addOrUpdateTrademarkHandler() {
   try {
     console.log("formRef", formRef.value);
-
     // 调用 formRef.value.validate() 方法来对这个表单中指定的数据（model、rules）进行校验
-  
-      const res = await formRef.value.validate();
-      console.log("校验成功", res);
- 
-
-    await requestSaveBaseTrademark(formData.value);
-    // 隐藏
-    isShowAddTrademarkDialog.value = false;
-    // 提示
-    ElMessage.success("添加成功");
-    // 获取最新的列表数据
+    const res = await formRef.value.validate();
     // 把当前页定到最后一页（新增的数据就在最后一页）
     page.value = Math.ceil((total.value + 1) / pageSize.value);
-    getTrademarkListByPage();
+    // 隐藏
+    isShowAddTrademarkDialog.value = false;
+    try {
+      if (messageType.value === "添加") {
+        await requestSaveBaseTrademark(formData.value);
+      } else {
+        await requestEditBaseTrademark(formData.value as ReqEditBaseTrademark);
+      }
+      // 提示
+      ElMessage.success("添加成功");
+      // 获取最新的列表数据
+
+      getTrademarkListByPage();
+    } catch (e) {
+      ("校验失败");
+    }
   } catch (e) {
     ElMessage.error("添加失败");
   }
