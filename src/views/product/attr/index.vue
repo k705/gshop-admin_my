@@ -1,5 +1,5 @@
 <template>
-  <div>平台属性管理</div>
+  <CategorySelector></CategorySelector>
 </template>
 
 <script lang="ts">
@@ -10,6 +10,12 @@ export default defineComponent({
 });
 </script>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+/* import {reqAttrInfoList } from "@/api/attrs"
+import type { ReqAttrValue } from "@/api/attrs"
+import { useCategorySelector } from "@/components/CategorySelector/index"
+const {category1,} */
+import CategorySelector from "@/components/CategorySelector/index.vue"
+</script>
 
 <style scoped></style>
