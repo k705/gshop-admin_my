@@ -29,7 +29,10 @@
               @click="showAddOrEditTrademarkDialog(row)"
               >编辑</el-button
             >
-            <el-button type="danger" icon="ele-Delete" @click=""
+            <el-button
+              type="danger"
+              icon="ele-Delete"
+              @click="deleteTrademarkHandler(row.id)"
               >删除</el-button
             >
           </template>
@@ -103,6 +106,7 @@ import {
   requestTrademarkListByPage,
   requestSaveBaseTrademark,
   requestEditBaseTrademark,
+  requestDeleteTrademark,
 } from "@/api/trademark";
 
 // 导入类型
@@ -112,7 +116,7 @@ import type {
   ReqEditBaseTrademark,
 } from "@/api/trademark";
 import type { FormRules } from "element-plus";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 // 定义数据类型
 const trademarks = ref<ResTrademark[]>([]);
@@ -237,6 +241,23 @@ function onSuccessHandler(response: { code: number; data: string }) {
   }
 }
 
+// 删除
+async function deleteTrademarkHandler(id: string) {
+  try {
+    try {
+      await ElMessageBox({
+        title: "提示",
+        message: "确定删除？",
+        icon:"ele-Delete"
+      });
+      await requestDeleteTrademark(id);
+      ElMessage.success("删除成功");
+      getTrademarkListByPage();
+    } catch (e) {}
+  } catch (e) {
+    ElMessage.error("删除失败");
+  }
+}
 // 调用获取列表数据方法
 getTrademarkListByPage();
 </script>

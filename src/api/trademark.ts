@@ -18,8 +18,8 @@ export interface ReqSaveBaseTrademark {
 enum URLS {
   LIST = "/product/baseTrademark",
     ADD = "/product/baseTrademark/save",
-    /* http://gmall-h5-api.atguigu.cn/admin/product/baseTrademark/update */
-  EDIT="/product/baseTrademark/update"
+    EDIT = "/product/baseTrademark/update",
+  DELETE = "/product/baseTrademark/remove"
 }
 
 // 请求品牌列表数据
@@ -38,3 +38,8 @@ export function requestSaveBaseTrademark(data: ReqSaveBaseTrademark) {
 export function requestEditBaseTrademark(data: ReqEditBaseTrademark) {
   return request.put<any, null>(URLS.EDIT, data);
 }
+
+/* ----删除品牌---- */
+export function requestDeleteTrademark(id:string) {
+        return request.delete<any,null>(`${URLS.DELETE}/${id}`)
+    }
