@@ -12,7 +12,8 @@ export type ResTrademarkByPage = ResPage<ResTrademark[]>;
 
 enum URLS{
     LIST = "/product/baseTrademark",
-    ADD = "/product/baseTrademark/save"
+    ADD = "/product/baseTrademark/save",
+    UPDATE = "/product/baseTrademark/update"
 }
 
 // 请求品牌列表数据
@@ -31,4 +32,9 @@ export function requestSaveBaseTrademark(data:ReqSaveBaseTrademark) {
 
 /* -----------------编辑更新-------------------- */
 // 定义数据类型
-export type ReqUpdateSaveBaseTrademark = ResTrademark
+export type ReqUpdateBaseTrademark = ResTrademark
+
+// 编辑品牌请求
+export function requestUpdateBaseTrademark(data:ReqUpdateBaseTrademark) {
+        return request.put<any,null>(URLS.UPDATE,data)
+    }
