@@ -1,5 +1,5 @@
 <template>
-  <div>平台属性管理</div>
+  <CategorySelector/>
 </template>
 
 <script lang="ts">
@@ -10,6 +10,8 @@ export default defineComponent({
 });
 </script>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import  CategorySelector  from "@/components/CategorySelector/index.vue";
+</script>
 
 <style scoped></style>
