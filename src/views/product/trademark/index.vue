@@ -30,7 +30,13 @@
             >
               修改
             </el-button>
-            <el-button type="danger" icon="ele-Delete"> 删除 </el-button>
+            <el-button
+              type="danger"
+              icon="ele-Delete"
+              @click="deleteTrademarkDialogHandler(row.id)"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -85,7 +91,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { ElMessage, type FormRules } from "element-plus";
+import { ElMessage, ElMessageBox, type FormRules } from "element-plus";
 
 export default defineComponent({
   name: "ProductTrademarkIndex",
@@ -101,6 +107,7 @@ import {
   requestTrademarkListByPage,
   requestSaveTrademark,
   requestEditTrademark,
+  requestDeleteTrademark,
 } from "@/api/trademark";
 
 // 导入类型
@@ -238,6 +245,23 @@ async function addOrUpdateTrademarkHandler() {
   }
 }
 
+// 删除品牌
+async function deleteTrademarkDialogHandler(id: number) {
+  try {
+    try {
+      await ElMessageBox({
+        title: "提示",
+        message: "确定删除？",
+        icon: "ele-Delete",
+      });
+
+      await requestDeleteTrademark(id);
+      ElMessage.success("删除成功");
+      getTrademarkListByPage();
+    } catch (e) {}
+  
+  } catch (e) {  ElMessage.error("删除失败");}
+}
 /* before-upload	上传文件之前的钩子，参数为上传的文件，若返回 false 或者返回 Promise 且被 reject，则停止上传。 */
 // 调用方法
 getTrademarkListByPage();

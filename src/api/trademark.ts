@@ -13,7 +13,8 @@ export type ResTrademarkByPage = ResPage<ResTrademark[]>;
 enum URLS {
   LIST = "/product/baseTrademark",
   ADD = "/product/baseTrademark/save",
-  UPDATE = "/product/baseTrademark/update",
+    UPDATE = "/product/baseTrademark/update",
+    DELETE= "/product/baseTrademark/remove"
 }
 
 // 请求品牌列表数据
@@ -39,3 +40,9 @@ export type ReqEditTrademark = ResTrademark;
 export function requestEditTrademark(data: ReqEditTrademark) {
   return request.put<any, null>(URLS.UPDATE, data);
 }
+
+/* -------删除品牌-------- */
+// http://gmall-h5-api.atguigu.cn/admin/product/baseTrademark/remove/{id}
+export function requestDeleteTrademark(id:number) {
+        return request.delete<any, null>(`${URLS.DELETE}/${id}`)
+    }
