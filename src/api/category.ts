@@ -33,7 +33,7 @@ export interface ResCategory2 extends ResCategory1{
     /**
      * 父级（一级）分类ID
      */
-    category1Id: number;
+    category1Id: string;
   
 }
 export function reqGetCategory2(category1Id:number) {
@@ -47,7 +47,7 @@ export interface ResCategory3  extends ResCategory1{
     /**
      * 父级（二级）分类ID
      */
-    category2Id: number;
+    category2Id: string;
     
 }
 export function reqGetCategory3(category2Id:number) {
