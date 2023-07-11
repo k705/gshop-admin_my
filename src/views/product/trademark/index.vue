@@ -30,7 +30,12 @@
               @click="showAddOrEditTrademarkDialogHandler(row)"
               >编辑</el-button
             >
-            <el-button type="danger" icon="ele-Delete">删除</el-button>
+            <el-button
+              type="danger"
+              icon="ele-Delete"
+              @click="deleteTrademarkHandler(row.id)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -102,6 +107,7 @@ import {
   requestTrademarkListByPage,
   requestSaveBaseTrademark,
   requestUpdateBaseTrademark,
+  requestDeleteBaseTrademark,
 } from "@/api/trademark";
 
 // 导入类型
@@ -111,7 +117,7 @@ import type {
   ReqUpdateBaseTrademark,
 } from "@/api/trademark";
 import type { FormRules } from "element-plus";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 // 定义数据类型
 const trademarks = ref<ResTrademark[]>([]);
@@ -225,7 +231,9 @@ async function addOrUpdateTrademarkHandler() {
       ElMessage.success(messageType.value + "成功");
 
       getTrademarkListByPage();
-    } catch (e) {console.log("校验成功", e);}
+    } catch (e) {
+      console.log("校验成功", e);
+    }
   } catch (e) {
     ElMessage.error(messageType.value + "失败");
   }
@@ -238,6 +246,22 @@ function onSuccessHandler(response: { code: number; data: string }) {
   }
 }
 
+// 删除品牌
+async function deleteTrademarkHandler(id: number) {
+  try {
+    try {
+      await ElMessageBox({
+        title: "提示",
+        message: "你确定要删除吗？",
+      });
+      await requestDeleteBaseTrademark(id);
+      ElMessage.success("删除成功");
+      getTrademarkListByPage();
+    } catch (e) {}
+  } catch (e) {
+    ElMessage.error("删除成功");
+  }
+}
 // 调用获取列表数据方法
 getTrademarkListByPage();
 </script>

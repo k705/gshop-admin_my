@@ -13,7 +13,8 @@ export type ResTrademarkByPage = ResPage<ResTrademark[]>;
 enum URLS{
     LIST = "/product/baseTrademark",
     ADD = "/product/baseTrademark/save",
-    UPDATE = "/product/baseTrademark/update"
+    UPDATE = "/product/baseTrademark/update",
+    DELETE   = "/product/baseTrademark/remove"
 }
 
 // 请求品牌列表数据
@@ -37,4 +38,9 @@ export type ReqUpdateBaseTrademark = ResTrademark
 // 编辑品牌请求
 export function requestUpdateBaseTrademark(data:ReqUpdateBaseTrademark) {
         return request.put<any,null>(URLS.UPDATE,data)
-    }
+}
+    
+/* -------------删除------------- */
+export function requestDeleteBaseTrademark(id:number) {
+        return request.delete<any,null>(`${URLS.DELETE}/${id}`)
+    }  
