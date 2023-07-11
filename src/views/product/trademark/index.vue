@@ -75,7 +75,9 @@
 
       <template #footer>
         <el-button @click="isShowAddTrademarkDialog = false">取消</el-button>
-        <el-button type="primary" @click="addTrademarkHandler">确认</el-button>
+        <el-button type="primary" @click="addOrUpdateTrademarkHandler"
+          >确认</el-button
+        >
       </template>
     </el-dialog>
   </div>
@@ -187,7 +189,7 @@ function showAddOrEditTrademarkDialogHandler(data?: ReqEditTrademark) {
 
   if (data) {
     messageType.value = "修改";
-    formData.value = {...data}
+    formData.value = { ...data };
   } else {
     messageType.value = "添加";
     //重置表单数据
@@ -212,19 +214,27 @@ function onSuccessHandler(response: { code: number; data: string }) {
   }
 }
 // 点击确定发送请求
-async function addTrademarkHandler() {
+async function addOrUpdateTrademarkHandler() {
   try {
-    const res = await formRef.value.validate();
-    await requestSaveTrademark(formData.value);
-    // 隐藏
-    isShowAddTrademarkDialog.value = false;
-    // 提示
-    ElMessage.success("添加成功");
-
-    page.value = Math.ceil((total.value + 1) / pageSize.value);
-    getTrademarkListByPage();
+    try {
+      const res = await formRef.value.validate();
+      await requestSaveTrademark(formData.value);
+      // 隐藏
+      isShowAddTrademarkDialog.value = false;
+      if (messageType.value === "添加") {
+        await requestSaveTrademark(formData.value);
+        page.value = Math.ceil((total.value + 1) / pageSize.value);
+      } else {
+        await requestEditTrademark(formData.value as ReqEditTrademark);
+      }
+      getTrademarkListByPage();
+      // 提示
+      ElMessage.success(messageType.value + "成功");
+    } catch (e) {
+      ("校验失败");
+    }
   } catch (e) {
-    ElMessage.error("添加失败");
+    ElMessage.error(messageType.value + "失败");
   }
 }
 
