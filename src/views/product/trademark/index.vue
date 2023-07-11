@@ -24,13 +24,14 @@
 
         <el-table-column label="操作">
           <template #="{ row }">
-          <el-button
-            type="warning"
-            icon="ele-Edit"
-            @click="showAddOrEditTrademarkDialogHandler(row )"
-            >编辑</el-button
-          > 
-          <el-button type="danger" icon="ele-Delete">删除</el-button> </template>
+            <el-button
+              type="warning"
+              icon="ele-Edit"
+              @click="showAddOrEditTrademarkDialogHandler(row)"
+              >编辑</el-button
+            >
+            <el-button type="danger" icon="ele-Delete">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
       <!-- footer-pagination组件 -->
@@ -76,7 +77,9 @@
       </el-form>
       <template #footer>
         <el-button @click="isShowAddTrademarkDialog = false">取 消</el-button>
-        <el-button type="primary" @click="addOrUpdateTrademarkHandler">确 定</el-button>
+        <el-button type="primary" @click="addOrUpdateTrademarkHandler"
+          >确 定</el-button
+        >
       </template>
     </el-dialog>
   </div>
@@ -98,6 +101,7 @@ import { ref, nextTick } from "vue";
 import {
   requestTrademarkListByPage,
   requestSaveBaseTrademark,
+  requestUpdateBaseTrademark,
 } from "@/api/trademark";
 
 // 导入类型
@@ -145,13 +149,12 @@ const rules: FormRules = {
   ],
 };
 
-
-
 const isShowAddTrademarkDialog = ref(false);
 const formData = ref<ReqSaveBaseTrademark | ReqUpdateBaseTrademark>({
   tmName: "",
   logoUrl: "",
 });
+const messageType = ref("");
 
 // 声明方法
 // 请求trademark
@@ -183,14 +186,16 @@ function showAddOrEditTrademarkDialogHandler(data?: ReqUpdateBaseTrademark) {
   isShowAddTrademarkDialog.value = true;
   if (data) {
     formData.value = { ...data };
+    messageType.value = "修改";
   } else {
     formData.value = { logoUrl: "", tmName: "" };
+    messageType.value = "添加";
   }
   /* 对整个表单进行重置，将所有字段值重置为初始值并移除校验结果 */
   /* nextTick后的回调函数放到异步任务中，在render渲染函数之后执行 */
   // nextTick(() => { formRef.value.resetFields() })
   nextTick(() => {
-    formRef.value.clearValidate();
+    formRef.value?.clearValidate();
   });
 }
 
@@ -200,21 +205,29 @@ async function addOrUpdateTrademarkHandler() {
     console.log("formRef", formRef.value);
 
     // 调用 formRef.value.validate() 方法来对这个表单中指定的数据（model、rules）进行校验
+    try {
+      const res = await formRef.value.validate();
+      console.log("校验成功", res);
 
-    const res = await formRef.value.validate();
-    console.log("校验成功", res);
+      await requestSaveBaseTrademark(formData.value);
+      // 隐藏
+      isShowAddTrademarkDialog.value = false;
+      // 如果是修改
+      if (messageType.value === "修改") {
+        await requestUpdateBaseTrademark(
+          formData.value as ReqUpdateBaseTrademark
+        );
+      } else {
+        await requestSaveBaseTrademark(formData.value as ReqSaveBaseTrademark); // 获取最新的列表数据
+        // 把当前页定到最后一页（新增的数据就在最后一页）
+        page.value = Math.ceil((total.value + 1) / pageSize.value);
+      } // 提示
+      ElMessage.success(messageType.value + "成功");
 
-    await requestSaveBaseTrademark(formData.value);
-    // 隐藏
-    isShowAddTrademarkDialog.value = false;
-    // 提示
-    ElMessage.success("添加成功");
-    // 获取最新的列表数据
-    // 把当前页定到最后一页（新增的数据就在最后一页）
-    page.value = Math.ceil((total.value + 1) / pageSize.value);
-    getTrademarkListByPage();
+      getTrademarkListByPage();
+    } catch (e) {console.log("校验成功", e);}
   } catch (e) {
-    ElMessage.error("添加失败");
+    ElMessage.error(messageType.value + "失败");
   }
 }
 
