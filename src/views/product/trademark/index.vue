@@ -23,12 +23,14 @@
         </el-table-column>
         <el-table-column label="操作">
           <template>
-            <el-button type="warning" icon="ele-Edit" @click="showAddOrEditTrademarkDialogHandler">
+            <el-button
+              type="warning"
+              icon="ele-Edit"
+              @click="showAddOrEditTrademarkDialogHandler"
+            >
               修改
             </el-button>
-            <el-button type="danger" icon="ele-Delete">
-              删除
-            </el-button>
+            <el-button type="danger" icon="ele-Delete"> 删除 </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -46,7 +48,12 @@
     </el-card>
 
     <el-dialog title="添加品牌" v-model="isShowAddTrademarkDialog">
-      <el-form :model="formData" ref="formRef" label-width="80px" :rules="rules">
+      <el-form
+        :model="formData"
+        ref="formRef"
+        label-width="80px"
+        :rules="rules"
+      >
         <el-form-item label="品牌名称" prop="tmName">
           <el-input v-model="formData.tmName"></el-input>
         </el-form-item>
@@ -67,7 +74,7 @@
       </el-form>
 
       <template #footer>
-        <el-button @click=" isShowAddTrademarkDialog = false">取消</el-button>
+        <el-button @click="isShowAddTrademarkDialog = false">取消</el-button>
         <el-button type="primary" @click="addTrademarkHandler">确认</el-button>
       </template>
     </el-dialog>
@@ -85,7 +92,7 @@ export default defineComponent({
 
 <script lang="ts" setup>
 // 导入vue内置模块
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 
 // 导入请求
 import {
@@ -104,7 +111,7 @@ const pageSize = ref(5);
 const isShowAddTrademarkDialog = ref(false);
 const formData = ref<ReqSaveTrademark>({ tmName: "", logoUrl: "" });
 const uploadUrl = `${import.meta.env.VITE_API_URL}/product/upload`;
-const formRef = ref()
+const formRef = ref();
 // 表单校验
 const rules: FormRules = {
   tmName: [
@@ -113,6 +120,7 @@ const rules: FormRules = {
       min: 1,
       max: 20,
       message: "品牌名称必须是1-20个字符之间",
+      trigger:'blur'
     },
   ],
   logoUrl: [
@@ -132,6 +140,7 @@ const rules: FormRules = {
           }
         }
       },
+      trigger:'blur'
     },
   ],
 };
@@ -167,9 +176,18 @@ function handleSizeChange(v: number) {
 function showAddOrEditTrademarkDialogHandler() {
   isShowAddTrademarkDialog.value = true;
   /* 对整个表单进行重置，将所有字段值重置为初始值并移除校验结果 */
-  formRef.value.resetFields()
-}
+  //重置表单数据
+  formData.value = {
+    tmName: "",
+    logoUrl: "",
+  };
 
+  // formRef.value.resetFields()
+  // 重置表单校验规则
+  nextTick(() => {
+    formRef.value?.clearValidate();
+  });
+}
 
 // 方法
 // 提交成功
@@ -187,16 +205,14 @@ async function addTrademarkHandler() {
     // 隐藏
     isShowAddTrademarkDialog.value = false;
     // 提示
-    ElMessage.success("添加成功");  
-    
+    ElMessage.success("添加成功");
+
     page.value = Math.ceil((total.value + 1) / pageSize.value);
     getTrademarkListByPage();
   } catch (e) {
     ElMessage.error("添加失败");
   }
 }
-
-
 
 /* before-upload	上传文件之前的钩子，参数为上传的文件，若返回 false 或者返回 Promise 且被 reject，则停止上传。 */
 // 调用方法
