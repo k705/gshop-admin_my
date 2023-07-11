@@ -65,7 +65,7 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="notShowAddTrademarkDialog">取 消</el-button>
+        <el-button @click="isShowAddTrademarkDialog = false">取 消</el-button>
         <el-button type="primary" @click="addTrademarkHandler">确 定</el-button>
       </template>
     </el-dialog>
@@ -82,7 +82,7 @@ export default defineComponent({
 
 <script lang="ts" setup>
 // 导入vue内置模块
-import { ref } from "vue";
+import { ref,nextTick } from "vue";
 
 // 导入请求
 import {
@@ -91,7 +91,7 @@ import {
 } from "@/api/trademark";
 
 // 导入类型
-import type { ResTrademark, ReqSaveBaseTrademark } from "@/api/trademark";
+import type { ResTrademark, ReqSaveBaseTrademark,ReqUpdateSaveBaseTrademark } from "@/api/trademark";
 import type { FormRules } from "element-plus";
 import { ElMessage } from "element-plus";
 
@@ -131,7 +131,7 @@ const rules: FormRules = {
 };
 
 const isShowAddTrademarkDialog = ref(false);
-const formData = ref<ReqSaveBaseTrademark>({
+const formData = ref<ReqSaveBaseTrademark | ReqUpdateSaveBaseTrademark>({
   tmName: "",
   logoUrl: "",
 });
@@ -162,12 +162,24 @@ function handleSizeChange(v: number) {
 
 /* ---------------------添加------------------------------ */
 // 点击添加显示添加框
-function showAddTrademarkDialog() {
+function showAddTrademarkDialog(data?:ReqUpdateSaveBaseTrademark) {
   isShowAddTrademarkDialog.value = true;
+
+  
+
+  if (data) {
+    formData.value = {...data}
+  } else {
+    formData.value.logoUrl = ''
+    formData.value.tmName = ''
+  }
+ /* 对整个表单进行重置，将所有字段值重置为初始值并移除校验结果 */
+/* nextTick后的回调函数放到异步任务中，在render渲染函数之后执行 */
+  // nextTick(() => { formRef.value.resetFields() })
+  nextTick(() => { formRef.value.resetFields() })
+
 }
-function notShowAddTrademarkDialog() {
-  isShowAddTrademarkDialog.value = false;
-}
+
 
 // 点击添加框的确定按钮发送请求
 async function addTrademarkHandler() {

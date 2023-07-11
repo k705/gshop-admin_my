@@ -23,11 +23,12 @@ export function requestTrademarkListByPage(page =1,limit=5) {
 
 /* -----------------------------添加页---------- */
     // 定义数据类型
-export interface ReqSaveBaseTrademark {
-    tmName: string,
-    logoUrl:string
-    }
+export type ReqSaveBaseTrademark = Omit<ResTrademark,"id">
     // 添加品牌请求
 export function requestSaveBaseTrademark(data:ReqSaveBaseTrademark) {
     return request.post<any,null>(URLS.ADD,data)
 }
+
+/* -----------------编辑更新-------------------- */
+// 定义数据类型
+export type ReqUpdateSaveBaseTrademark = ResTrademark
