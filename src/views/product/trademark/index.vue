@@ -6,7 +6,7 @@
         <el-button
           type="primary"
           icon="ele-Plus"
-          @click="showAddOrEditTrademarkDialogHandler"
+          @click="showAddOrEditTrademarkDialogHandler()"
         >
           添加
         </el-button>
@@ -22,11 +22,11 @@
           </template>
         </el-table-column>
         <el-table-column label="操作">
-          <template>
+          <template #="{ row }">
             <el-button
               type="warning"
               icon="ele-Edit"
-              @click="showAddOrEditTrademarkDialogHandler"
+              @click="showAddOrEditTrademarkDialogHandler(row)"
             >
               修改
             </el-button>
@@ -98,10 +98,15 @@ import { nextTick, ref } from "vue";
 import {
   requestTrademarkListByPage,
   requestSaveTrademark,
+  requestEditTrademark,
 } from "@/api/trademark";
 
 // 导入类型
-import type { ResTrademark, ReqSaveTrademark } from "@/api/trademark";
+import type {
+  ResTrademark,
+  ReqSaveTrademark,
+  ReqEditTrademark,
+} from "@/api/trademark";
 
 // 定义数据类型
 const trademarks = ref<ResTrademark[]>([]);
@@ -120,7 +125,7 @@ const rules: FormRules = {
       min: 1,
       max: 20,
       message: "品牌名称必须是1-20个字符之间",
-      trigger:'blur'
+      trigger: "blur",
     },
   ],
   logoUrl: [
@@ -140,10 +145,13 @@ const rules: FormRules = {
           }
         }
       },
-      trigger:'blur'
+      trigger: "blur",
     },
   ],
 };
+
+// 判断修改还是添加
+const messageType = ref("");
 
 // 声明方法
 
@@ -173,15 +181,21 @@ function handleSizeChange(v: number) {
 // 发请求
 
 // 点击添加按钮弹出对话框
-function showAddOrEditTrademarkDialogHandler() {
+function showAddOrEditTrademarkDialogHandler(data?: ReqEditTrademark) {
   isShowAddTrademarkDialog.value = true;
   /* 对整个表单进行重置，将所有字段值重置为初始值并移除校验结果 */
-  //重置表单数据
-  formData.value = {
-    tmName: "",
-    logoUrl: "",
-  };
 
+  if (data) {
+    messageType.value = "修改";
+    formData.value = {...data}
+  } else {
+    messageType.value = "添加";
+    //重置表单数据
+    formData.value = {
+      tmName: "",
+      logoUrl: "",
+    };
+  }
   // formRef.value.resetFields()
   // 重置表单校验规则
   nextTick(() => {
