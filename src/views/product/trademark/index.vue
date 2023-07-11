@@ -6,7 +6,7 @@
         <el-button
           type="primary"
           icon="ele-Plus"
-          @click="showAddTrademarkDialogHandler"
+          @click="showAddOrEditTrademarkDialogHandler"
         >
           添加
         </el-button>
@@ -21,7 +21,16 @@
             <img :src="row.logoUrl" width="100" />
           </template>
         </el-table-column>
-        <el-table-column label="操作"></el-table-column>
+        <el-table-column label="操作">
+          <template>
+            <el-button type="warning" icon="ele-Edit" @click="showAddOrEditTrademarkDialogHandler">
+              修改
+            </el-button>
+            <el-button type="danger" icon="ele-Delete">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <!-- footer-pagination组件 -->
       <el-pagination
@@ -58,7 +67,7 @@
       </el-form>
 
       <template #footer>
-        <el-button @click="notShowAddTrademarkDialogHandler">取消</el-button>
+        <el-button @click=" isShowAddTrademarkDialog = false">取消</el-button>
         <el-button type="primary" @click="addTrademarkHandler">确认</el-button>
       </template>
     </el-dialog>
@@ -155,12 +164,12 @@ function handleSizeChange(v: number) {
 // 发请求
 
 // 点击添加按钮弹出对话框
-function showAddTrademarkDialogHandler() {
+function showAddOrEditTrademarkDialogHandler() {
   isShowAddTrademarkDialog.value = true;
+  /* 对整个表单进行重置，将所有字段值重置为初始值并移除校验结果 */
+  formRef.value.resetFields()
 }
-function notShowAddTrademarkDialogHandler() {
-  isShowAddTrademarkDialog.value = false;
-}
+
 
 // 方法
 // 提交成功
@@ -178,7 +187,8 @@ async function addTrademarkHandler() {
     // 隐藏
     isShowAddTrademarkDialog.value = false;
     // 提示
-    ElMessage.success("添加成功");
+    ElMessage.success("添加成功");  
+    
     page.value = Math.ceil((total.value + 1) / pageSize.value);
     getTrademarkListByPage();
   } catch (e) {
@@ -186,6 +196,9 @@ async function addTrademarkHandler() {
   }
 }
 
+
+
+/* before-upload	上传文件之前的钩子，参数为上传的文件，若返回 false 或者返回 Promise 且被 reject，则停止上传。 */
 // 调用方法
 getTrademarkListByPage();
 </script>
