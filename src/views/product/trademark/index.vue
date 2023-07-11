@@ -215,7 +215,7 @@ async function addOrUpdateTrademarkHandler() {
       const res = await formRef.value.validate();
       console.log("校验成功", res);
 
-      await requestSaveBaseTrademark(formData.value);
+     
       // 隐藏
       isShowAddTrademarkDialog.value = false;
       // 如果是修改
