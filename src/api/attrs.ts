@@ -22,11 +22,23 @@ export interface ReqAttrValueList {
     //平台属性值的名称
     valueName: string;
 }
-
+/**
+ * 保存接口需要的数据结构
+ */
+/* export type ReqSaveAttr = Omit<ResAttr, "id" | "attrValueList"> & {
+    attrValueList: Pick<ResAttrValue, "valueName">[];
+  }; */
+export type ReqSaveAttr = Omit<ReqAttrValue, "id" | "attrValueList"> & {
+    attrValueList:Pick<ReqAttrValueList,"valueName">[]
+}
 enum URLS {
-    ATTR_INFO_LIST='/product/attrInfoList'
+    ATTR_INFO_LIST = '/product/attrInfoList',
+    SAVE = "/product/saveAttrInfo",
 }
 
 export function reqAttrInfoList(category1Id:string,category2Id:string,category3Id:string) {
 return request.get<any,ReqAttrValue[]>(`${URLS.ATTR_INFO_LIST}/${category1Id}/${category2Id}/${category3Id}`)
-    }
+}
+export function reqSaveAttrInfo(data:ReqSaveAttr) {
+    return request.post<any,any>(URLS.SAVE,data)
+        }
