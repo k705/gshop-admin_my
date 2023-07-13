@@ -7,7 +7,7 @@
         <el-button
           type="primary"
           icon="ele-Plus"
-          @click="showAddOrEditAttrsHandler"
+          @click="showAddOrEditAttrsHandler()"
           :disabled="!category3Id"
           >添加属性</el-button
         >
@@ -27,7 +27,7 @@
           </el-table-column>
           <el-table-column label="操作">
             <template #="{ row }">
-              <el-button type="warning" icon="ele-Edit"></el-button>
+              <el-button type="warning" icon="ele-Edit" @click="showAddOrEditAttrsHandler(row)"></el-button>
               <el-button type="danger" icon="ele-Delete"></el-button>
             </template>
           </el-table-column>
@@ -119,6 +119,7 @@ import type {
   ReqAttrValue,
 } from "@/api/attrs";
 import useCategorySelector from "@/components/CategorySelector/index";
+import _ from "lodash";
 
 const { category1Id, category2Id, category3Id } = useCategorySelector();
 const isShowView = ref(true);
@@ -127,15 +128,22 @@ const formData = ref<ReqSaveAttr | null>(null);
 const attrValueInputRef = ref<typeof ElInput | null>(null);
 const inputAttrValue = ref("");
 
-function showAddOrEditAttrsHandler() {
+function showAddOrEditAttrsHandler(row?: ReqAttr) {
   isShowView.value = false;
-  // 初始化formData
-  formData.value = {
-    categoryId: Number(category3Id.value),
-    categoryLevel: 3,
-    attrName: "",
-    attrValueList: [],
-  };
+
+  if (row) {
+    // 编辑的初始化
+    // 使用深拷贝
+    formData.value = _.cloneDeep(row);
+  } else {
+    // 初始化formData
+    formData.value = {
+      categoryId: Number(category3Id.value),
+      categoryLevel: 3,
+      attrName: "",
+      attrValueList: [],
+    };
+  }
 }
 function addAttrValueHandler() {
   formData.value?.attrValueList.push({
