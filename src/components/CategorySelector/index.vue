@@ -64,12 +64,9 @@ import useCategorySelector from "./index";
   }
 ); */
 withDefaults(
-  defineProps<{ disabled: boolean; obj: Record<string, any> }>(),
+  defineProps<{ disabled: boolean;}>(),
   {
   disabled: false,
-    obj(){
-    return{x:1}
-  }
 })
 const {
   category1Id,
