@@ -54,8 +54,13 @@
           <el-table-column label="属性值名称">
             <template #="{ row }">
               <!-- 如果不是正在编辑的状态则展示span标签 -->
-              <span v-if="!row.isEdit">{{ row.valueName }}</span>
-              <el-input v-else
+              <span
+                v-if="!row.isEdit"
+                @dblclick="changeAttrValueHandler(row)"
+                >{{ row.valueName }}</span
+              >
+              <el-input
+                v-else
                 ref="attrValueInputRef"
                 v-model="inputAttrValue"
                 @blur="addNewAttrValueHandler(row)"
@@ -87,7 +92,12 @@ export default defineComponent({
 import { nextTick, ref, watch } from "vue";
 import CategorySelector from "@/components/CategorySelector/index.vue";
 import { reqAttrInfoList, reqSaveAttrInfo } from "@/api/attrs";
-import type { ReqAttr, ReqSaveAttr, ReqAttrValueList,ReqAttrValue } from "@/api/attrs";
+import type {
+  ReqAttr,
+  ReqSaveAttr,
+  ReqAttrValueList,
+  ReqAttrValue,
+} from "@/api/attrs";
 import useCategorySelector from "@/components/CategorySelector/index";
 
 const { category1Id, category2Id, category3Id } = useCategorySelector();
@@ -110,7 +120,7 @@ function showAddOrEditAttrsHandler() {
 function addAttrValueHandler() {
   formData.value?.attrValueList.push({
     valueName: "",
-    isEdit:true
+    isEdit: true,
   });
   nextTick(() => {
     attrValueInputRef.value?.focus();
@@ -121,7 +131,7 @@ function addNewAttrValueHandler(row: ReqAttrValue) {
   // 1.判断输入值是否为空
   const newValue = inputAttrValue.value.trim();
   // 解决回车键会调用两次函数问题:按下回车键也会触发失焦事件，按下回车键编辑状态变为false，所以如果row.isEdit为false则什么也不做，失焦事件会调用函数则不会出现调两次函数的问题
-  if(!row.isEdit)return
+  if (!row.isEdit) return;
   if (newValue === "") {
     // 如果为空则说明用户没有输入任何内容，则放弃添加，从formData.value.attrValueList中删除row
     if (formData.value) {
@@ -132,7 +142,7 @@ function addNewAttrValueHandler(row: ReqAttrValue) {
       inputAttrValue.value = "";
     }
   } else {
-    // 如果不为空则查找此属性值在数组是否已经存在，需要在查找过程中排除和自身的比较（编辑的时候）
+    // 如果不为空则查找此属性值在数组是否已经存在，需要在查找过程中排除和自身的比较（编辑的时候）,每一行对应的item和row是对应的所以如果相等的话说明就是当前行，就要排除这种情况
     const isExists = formData.value?.attrValueList.find((item) => {
       console.log(item);
       return item.valueName == newValue && item != row;
@@ -152,11 +162,19 @@ function addNewAttrValueHandler(row: ReqAttrValue) {
       console.log(row);
       console.log(newValue);
       // 改变isEdit的状态，显示span标签
-      row.isEdit = false
+      row.isEdit = false;
       // 清空inputValue中存储的值
       inputAttrValue.value = "";
     }
   }
+}
+
+function changeAttrValueHandler(row: ReqAttrValue) {
+  row.isEdit = true;
+  inputAttrValue.value = row.valueName;
+  nextTick(() => {
+    attrValueInputRef.value?.focus();
+  });
 }
 
 watch(category3Id, async () => {
