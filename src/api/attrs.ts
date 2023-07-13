@@ -25,24 +25,23 @@ export interface ReqAttrValueList {
 }
 
 // 每个属性值类型
-export type ReqAttrValue = Pick<ReqAttrValueList, "valueName">  & {
+export type ReqAttrValue = Pick<ReqAttrValueList, "valueName"> & {
   isEdit?: boolean;
-}
-& {
-    id?: number;
-    attrId?: number;
-  }
+} & {
+  id?: number;
+  attrId?: number;
+};
 
 // 发送存储数据请求时传递的新增属性值的类型
 export type ReqSaveAttr = Omit<ReqAttr, "id" | "attrValueList"> & {
-    attrValueList: ReqAttrValue[];
-}
-    & {
-    id?: number;
-}
+  attrValueList: ReqAttrValue[];
+} & {
+  id?: number;
+};
 enum URLS {
   ATTR_INFO_LIST = "/product/attrInfoList",
   SAVE = "/product/saveAttrInfo",
+  DELETE = "/product/deleteAttr",
 }
 
 export function reqAttrInfoList(
@@ -56,4 +55,10 @@ export function reqAttrInfoList(
 }
 export function reqSaveAttrInfo(data: ReqSaveAttr) {
   return request.post<any, any>(URLS.SAVE, data);
+}
+
+/* http://gmall-h5-api.atguigu.cn/admin/product/deleteAttr/{id} */
+
+export function reqDeleteAttrInfo(id: number) {
+  return request.delete<any, any>(`${URLS.DELETE}/${id}`);
 }

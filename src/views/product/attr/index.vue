@@ -27,8 +27,19 @@
           </el-table-column>
           <el-table-column label="操作">
             <template #="{ row }">
-              <el-button type="warning" icon="ele-Edit" @click="showAddOrEditAttrsHandler(row)"></el-button>
-              <el-button type="danger" icon="ele-Delete"></el-button>
+              <el-button
+                type="warning"
+                icon="ele-Edit"
+                @click="showAddOrEditAttrsHandler(row)"
+              ></el-button>
+              <el-popconfirm
+                title="你确定要删除吗？"
+                @confirm="confirmDeleteAttrHandler(row.id)"
+              >
+                <template #reference>
+                  <el-button type="danger" icon="ele-Delete"></el-button>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -111,7 +122,11 @@ export default defineComponent({
 <script lang="ts" setup>
 import { nextTick, ref, watch } from "vue";
 import CategorySelector from "@/components/CategorySelector/index.vue";
-import { reqAttrInfoList, reqSaveAttrInfo } from "@/api/attrs";
+import {
+  reqAttrInfoList,
+  reqSaveAttrInfo,
+  reqDeleteAttrInfo,
+} from "@/api/attrs";
 import type {
   ReqAttr,
   ReqSaveAttr,
@@ -228,15 +243,15 @@ function addNewAttrHandler() {
 
 async function saveAttrValueHandler() {
   if (formData.value) {
-    const messageType = formData.value.id?"修改":"保存"
+    const messageType = formData.value.id ? "修改" : "保存";
     try {
       await reqSaveAttrInfo(formData.value);
       console.log(formData.value);
-      getAttrs()
-      isShowView.value = true
-      ElMessage.success(messageType+"成功");
+      getAttrs();
+      isShowView.value = true;
+      ElMessage.success(messageType + "成功");
     } catch (e) {
-      ElMessage.error(messageType+"失败");
+      ElMessage.error(messageType + "失败");
     }
   }
 }
@@ -251,6 +266,13 @@ async function getAttrs() {
       );
     } catch (e) {}
   }
+}
+
+async function confirmDeleteAttrHandler(id: number) {
+  try {
+    await reqDeleteAttrInfo(id);
+    getAttrs()
+  } catch (e) {}
 }
 watch(category3Id, getAttrs);
 </script>
