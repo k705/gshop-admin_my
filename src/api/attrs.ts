@@ -25,14 +25,21 @@ export interface ReqAttrValueList {
 }
 
 // 每个属性值类型
-export type ReqAttrValue = Pick<ReqAttrValueList, "valueName"> & {
+export type ReqAttrValue = Pick<ReqAttrValueList, "valueName">  & {
   isEdit?: boolean;
-};
+}
+& {
+    id?: number;
+    attrId?: number;
+  }
 
 // 发送存储数据请求时传递的新增属性值的类型
 export type ReqSaveAttr = Omit<ReqAttr, "id" | "attrValueList"> & {
-  attrValueList: ReqAttrValue[];
-};
+    attrValueList: ReqAttrValue[];
+}
+    & {
+    id?: number;
+}
 enum URLS {
   ATTR_INFO_LIST = "/product/attrInfoList",
   SAVE = "/product/saveAttrInfo",

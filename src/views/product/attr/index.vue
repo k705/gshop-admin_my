@@ -228,13 +228,15 @@ function addNewAttrHandler() {
 
 async function saveAttrValueHandler() {
   if (formData.value) {
+    const messageType = formData.value.id?"修改":"保存"
     try {
       await reqSaveAttrInfo(formData.value);
+      console.log(formData.value);
       getAttrs()
       isShowView.value = true
-      ElMessage.success("保存成功");
+      ElMessage.success(messageType+"成功");
     } catch (e) {
-      ElMessage.error("保存失败");
+      ElMessage.error(messageType+"失败");
     }
   }
 }
