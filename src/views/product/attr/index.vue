@@ -68,7 +68,15 @@
               ></el-input>
             </template>
           </el-table-column>
-          <el-table-column label="操作"></el-table-column>
+          <el-table-column label="操作">
+           <template #="{row}">
+            <el-button
+              type="danger"
+             icon="ele-Delete"
+              @click="deleteAttrValueHandler(row)"
+            ></el-button>
+           </template>
+          </el-table-column>
         </el-table>
         <div>
           <el-button type="primary">保存</el-button>
@@ -82,6 +90,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { ElMessage, type ElInput } from "element-plus";
+
 
 export default defineComponent({
   name: "ProductAttrIndex",
@@ -175,6 +184,15 @@ function changeAttrValueHandler(row: ReqAttrValue) {
   nextTick(() => {
     attrValueInputRef.value?.focus();
   });
+}
+
+function deleteAttrValueHandler(row: ReqAttrValue) {
+  if (formData.value) {
+    formData.value.attrValueList = formData.value.attrValueList.filter(
+      // 过滤出和这一行值不相等的数据即删掉这一行的数据
+      (item) => item != row
+    );
+  }
 }
 
 watch(category3Id, async () => {
