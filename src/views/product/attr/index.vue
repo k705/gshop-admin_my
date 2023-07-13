@@ -37,7 +37,11 @@
       <div v-else>
         <el-form inline>
           <el-form-item label="属性名">
-            <el-input v-model="formData!.attrName"></el-input>
+            <el-input
+              v-model="formData!.attrName"
+              @blur="addNewAttrHandler"
+              @keydown.enter="addNewAttrHandler"
+            ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button
@@ -69,17 +73,25 @@
             </template>
           </el-table-column>
           <el-table-column label="操作">
-           <template #="{row}">
-            <el-button
-              type="danger"
-             icon="ele-Delete"
-              @click="deleteAttrValueHandler(row)"
-            ></el-button>
-           </template>
+            <template #="{ row }">
+              <el-button
+                type="danger"
+                icon="ele-Delete"
+                @click="deleteAttrValueHandler(row)"
+              ></el-button>
+            </template>
           </el-table-column>
         </el-table>
         <div>
-          <el-button type="primary">保存</el-button>
+          <!-- 1.不禁用保存按钮：如果属性名有值且属性值有值 -->
+          <el-button
+            type="primary"
+            @click="saveAttrValueHandler"
+            :disabled="
+              !(formData?.attrName && formData.attrValueList.length > 0)
+            "
+            >保存</el-button
+          >
           <el-button @click="isShowView = true">取消</el-button>
         </div>
       </div>
@@ -90,7 +102,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { ElMessage, type ElInput } from "element-plus";
-
 
 export default defineComponent({
   name: "ProductAttrIndex",
@@ -194,8 +205,33 @@ function deleteAttrValueHandler(row: ReqAttrValue) {
     );
   }
 }
+// 检测是否有重复属性名
+function addNewAttrHandler() {
+  if (formData.value) {
+    const isExists = attrs.value.find((item) => {
+      item.attrName != formData.value?.attrName;
+    });
+    if (isExists) {
+      ElMessage.error("已经存在相同属性名");
+      formData.value.attrName = "";
+    }
+  }
+}
 
-watch(category3Id, async () => {
+async function saveAttrValueHandler() {
+  if (formData.value) {
+    try {
+      await reqSaveAttrInfo(formData.value);
+      getAttrs()
+      isShowView.value = true
+      ElMessage.success("保存成功");
+    } catch (e) {
+      ElMessage.error("保存失败");
+    }
+  }
+}
+
+async function getAttrs() {
   if (category3Id.value !== "") {
     try {
       attrs.value = await reqAttrInfoList(
@@ -205,7 +241,8 @@ watch(category3Id, async () => {
       );
     } catch (e) {}
   }
-});
+}
+watch(category3Id, getAttrs);
 </script>
 
 <style scoped></style>
